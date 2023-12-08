@@ -58,6 +58,7 @@ from glance.common import store_utils
 from glance.common import utils
 from glance import i18n
 from glance.i18n import _, _LE, _LI, _LW
+from glance.image_cache import prefetcher
 
 
 bind_opts = [
@@ -541,9 +542,6 @@ class BaseServer(object):
         self.initialize_glance_store = initialize_glance_store
         self.initialize_prefetcher = initialize_prefetcher
         if self.initialize_prefetcher:
-            # NOTE(abhishekk): Importing the prefetcher just in time to avoid
-            # import loop during initialization
-            from glance.image_cache import prefetcher  # noqa
             self.prefetcher = prefetcher.Prefetcher()
 
     def cache_images(self):
@@ -625,6 +623,7 @@ class BaseServer(object):
         """
         eventlet.wsgi.MAX_HEADER_LINE = CONF.max_header_line
         self.client_socket_timeout = CONF.client_socket_timeout or None
+        self.configure_socket(old_conf, has_changed)
         if self.initialize_glance_store:
             if CONF.enabled_backends:
                 if store_utils.check_reserved_stores(CONF.enabled_backends):
@@ -635,7 +634,6 @@ class BaseServer(object):
                 initialize_multi_store()
             else:
                 initialize_glance_store()
-        self.configure_socket(old_conf, has_changed)
 
     def wait(self):
         """Wait until all servers have completed running."""

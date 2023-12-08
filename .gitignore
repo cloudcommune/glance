@@ -41,3 +41,4 @@ releasenotes/build
 .eric5project/
 .issues/
 .ropeproject
+.idea/*

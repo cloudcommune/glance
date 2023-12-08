@@ -523,15 +523,13 @@ class ImagesController(object):
 
         val_data = self._validate_validation_data(image, value)
         # NOTE(abhishekk): get glance store based on location uri
-        updated_location = value
         if CONF.enabled_backends:
-            updated_location = store_utils.get_updated_store_location(
-                value)
+            store_utils.update_store_in_locations(value, image.image_id)
 
         try:
             # NOTE(flwang): _locations_proxy's setattr method will check if
             # the update is acceptable.
-            image.locations = updated_location
+            image.locations = value
             if image.status == 'queued':
                 for k, v in val_data.items():
                     setattr(image, k, v)
@@ -543,10 +541,13 @@ class ImagesController(object):
                 explanation=encodeutils.exception_to_unicode(ve))
 
     def _do_add_locations(self, image, path_pos, value):
-        if CONF.show_multiple_locations == False:
-            msg = _("It's not allowed to add locations if locations are "
-                    "invisible.")
-            raise webob.exc.HTTPForbidden(explanation=msg)
+        """support add locations if locations are invisible. so we need to
+        annotation it
+        """
+        # if CONF.show_multiple_locations == False:
+        #     msg = _("It's not allowed to add locations if locations are "
+        #             "invisible.")
+        #     raise webob.exc.HTTPForbidden(explanation=msg)
 
         if image.status not in ('active', 'queued'):
             msg = _("It's not allowed to add locations if image status is "
@@ -555,10 +556,8 @@ class ImagesController(object):
 
         val_data = self._validate_validation_data(image, [value])
         # NOTE(abhishekk): get glance store based on location uri
-        updated_location = value
         if CONF.enabled_backends:
-            updated_location = store_utils.get_updated_store_location(
-                [value])[0]
+            store_utils.update_store_in_locations([value], image.image_id)
 
         pos = self._get_locations_op_pos(path_pos,
                                          len(image.locations), True)
@@ -566,7 +565,7 @@ class ImagesController(object):
             msg = _("Invalid position for adding a location.")
             raise webob.exc.HTTPBadRequest(explanation=msg)
         try:
-            image.locations.insert(pos, updated_location)
+            image.locations.insert(pos, value)
             if image.status == 'queued':
                 for k, v in val_data.items():
                     setattr(image, k, v)
@@ -612,8 +611,8 @@ class ImagesController(object):
 class RequestDeserializer(wsgi.JSONRequestDeserializer):
 
     _disallowed_properties = ('direct_url', 'self', 'file', 'schema')
-    _readonly_properties = ('created_at', 'updated_at', 'status', 'checksum',
-                            'size', 'virtual_size', 'direct_url', 'self',
+    _readonly_properties = ('created_at', 'updated_at', 'status',
+                            'virtual_size', 'direct_url', 'self',
                             'file', 'schema', 'id', 'os_hash_algo',
                             'os_hash_value')
     _reserved_properties = ('location', 'deleted', 'deleted_at')

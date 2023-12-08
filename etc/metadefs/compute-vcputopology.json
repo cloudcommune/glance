@@ -35,17 +35,17 @@
             "description": "Preferred number of threads to expose to the guest.",
             "type": "integer"
         },
-        "cpu_max_sockets": {
+        "cpu_maxsockets": {
             "title": "Max vCPU Sockets",
             "description": "Maximum number of sockets to expose to the guest.",
             "type": "integer"
         },
-        "cpu_max_cores": {
+        "cpu_maxcores": {
             "title": "Max vCPU Cores",
             "description": "Maximum number of cores to expose to the guest.",
             "type": "integer"
         },
-        "cpu_max_threads": {
+        "cpu_maxthreads": {
             "title": "Max vCPU Threads",
             "description": "Maximum number of threads to expose to the guest.",
             "type": "integer"

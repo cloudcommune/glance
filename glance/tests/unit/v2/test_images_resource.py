@@ -3629,10 +3629,10 @@ class TestImagesDeserializer(test_utils.BaseTestCase):
         samples = {
             'id': '00000000-0000-0000-0000-000000000000',
             'status': 'active',
-            'checksum': 'abcdefghijklmnopqrstuvwxyz012345',
+            # 'checksum': 'abcdefghijklmnopqrstuvwxyz012345',
             'os_hash_algo': 'supersecure',
             'os_hash_value': 'a' * 32 + 'b' * 32 + 'c' * 32 + 'd' * 32,
-            'size': 9001,
+            # 'size': 9001,
             'virtual_size': 9001,
             'created_at': ISOTIME,
             'updated_at': ISOTIME,
@@ -5172,7 +5172,7 @@ class TestMultiImagesController(base.MultiIsolatedUnitTest):
         request = unit_test_utils.get_fake_request()
         self.assertRaises(webob.exc.HTTPConflict,
                           self.controller.import_image,
-                          request, UUID2,
+                          request, UUID1,
                           {'method': {'name': 'glance-direct'}})
 
     def test_image_lazy_loading_store(self):
